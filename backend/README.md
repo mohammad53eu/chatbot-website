@@ -10,9 +10,10 @@ This backend is an Express + TypeScript scaffold focusing on authentication. The
 - JSON Web Tokens
 
 ## Endpoints
+All route files now live under `src/routes` for clearer structure.
+
 | Method | Path | Description |
 | ------ | ---- | ----------- |
-| GET | /health | Health check |
 | POST | /auth/register | Register with email or username + password |
 | POST | /auth/login | Login with email or username + password |
 | GET | /auth/google | Placeholder (501) OAuth start |

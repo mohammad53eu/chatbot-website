@@ -5,6 +5,7 @@ import { LoginInput, RegisterInput, User } from '../types/auth';
 import { signAuthToken } from '../utils/jwt';
 
 export async function register(input: RegisterInput): Promise<{ user: User; token: string }>{
+
   const now = new Date();
   const user: User = {
     id: randomUUID(),
@@ -15,6 +16,7 @@ export async function register(input: RegisterInput): Promise<{ user: User; toke
     createdAt: now,
     updatedAt: now,
   };
+  
   userRepository.create(user);
   const token = signAuthToken({ sub: user.id, provider: user.provider });
   return { user: publicUser(user), token };

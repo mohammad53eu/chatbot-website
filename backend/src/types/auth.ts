@@ -1,28 +1,33 @@
-export type AuthProvider = 'local' | 'google';
-
 export interface User {
   id: string;
-  provider: AuthProvider;
-  providerId?: string; // Google 'sub' value
-  email?: string; // unique when present
-  username?: string; // unique when present
-  passwordHash?: string; // absent for google accounts
+  email: string;
+  name: string;
+  passwordHash: string;
+  image?: Image;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface RegisterInput {
-  identifierType: 'email' | 'username';
-  identifier: string; // email or username depending on identifierType
+  email: string;
+  name: string;
   password: string;
 }
 
 export interface LoginInput {
-  identifier: string; // email or username
+  email: string; // email or username
   password: string;
 }
 
 export interface AuthTokenPayload {
   sub: string; // user id
-  provider: AuthProvider;
+}
+
+interface Image {
+  id: string;
+  url: string;           // e.g., "/uploads/avatars/abc123.jpg" (relative path)
+  filename: string;      // Original filename e.g., "profile.jpg"
+  mimeType: string;      // e.g., "image/jpeg", "image/png"
+  size: number;          // File size in bytes
+  createdAt: Date;
 }

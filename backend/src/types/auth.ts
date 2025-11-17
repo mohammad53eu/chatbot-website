@@ -3,7 +3,7 @@ export interface User {
   email: string;
   name: string;
   passwordHash: string;
-  image?: Image;
+  avatar_path: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,11 +23,10 @@ export interface AuthTokenPayload {
   sub: string; // user id
 }
 
-interface Image {
-  id: string;
-  url: string;           // e.g., "/uploads/avatars/abc123.jpg" (relative path)
-  filename: string;      // Original filename e.g., "profile.jpg"
-  mimeType: string;      // e.g., "image/jpeg", "image/png"
-  size: number;          // File size in bytes
+export interface SafeUser {
+  id: number;
+  email: string;
+  username: string;
+  avatar: string | null;
   createdAt: Date;
 }

@@ -1,14 +1,17 @@
-import { query } from './db';
+import { emailExists, createUser } from './userQueries';
+import { hashPassword } from '../utils/password';
 
+const test = async () => {
+  // Check if test email exists
+  const exists = await emailExists('test@example.com');
+  console.log('Email exists:', exists);
 
-
-const testConnection = async () => {
-  try {
-    const result = await query('SELECT NOW()');
-    console.log('✅ Database connected:', result.rows[0]);
-  } catch (error) {
-    console.error('❌ Database connection failed:', error);
+  // Create a test user (run only once!)
+  if (!exists) {
+    const hashed = await hashPassword('Test123!@#');
+    const user = await createUser('test@example.com', 'testuser', hashed);
+    console.log('Created user:', user);
   }
 };
 
-testConnection();
+test();

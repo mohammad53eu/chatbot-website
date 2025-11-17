@@ -1,14 +1,46 @@
-// import jwt from 'jsonwebtoken';
-// import { AuthTokenPayload } from '../types/auth';
-// import { getEnv } from '../utils/env';
+import jwt from "jsonwebtoken";
+import { getEnv } from "./env"
 
-// const JWT_SECRET = getEnv('JWT_SECRET', 'dev_secret');
-// const EXPIRY = '1h';
+interface JwtPayload {
+    userId: number;
+    email: string;
+}
 
-// export function signAuthToken(payload: AuthTokenPayload): string {
-//   return jwt.sign(payload, JWT_SECRET, { expiresIn: EXPIRY });
-// }
+export const generateToken = (userId: number, email: string): string => {
 
-// export function verifyAuthToken(token: string): AuthTokenPayload {
-//   return jwt.verify(token, JWT_SECRET) as AuthTokenPayload;
-// }
+    const payload: JwtPayload = {
+        userId,
+        email,
+    };
+
+    const expiresInValue = getEnv("JWT_EXPIRES_IN") as any;
+
+    const token = jwt.sign(
+        payload,
+        getEnv("JWT_SECRET") as string,
+        {
+            expiresIn: expiresInValue || "24h",
+        }
+    );
+    return token;
+};
+
+export const verifyToken = (token: string): JwtPayload => {
+    try {
+        const decoded = jwt.verify(
+            token,
+            getEnv("JWT_SECRET") as string,
+        ) as JwtPayload;
+
+        return decoded;
+
+    } catch (error) {
+        if(error instanceof jwt.JsonWebTokenError){
+            throw new Error('invalid token');
+        }
+        if(error instanceof jwt.TokenExpiredError){
+            throw new Error('token expired');
+        }
+        throw new Error('token verification failed!');
+    }
+};

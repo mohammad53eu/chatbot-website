@@ -1,8 +1,8 @@
 export interface User {
-  id: string;
+  id: number;
   email: string;
-  name: string;
-  passwordHash: string;
+  username: string;
+  password_hash: string;
   avatar_path: string | null;
   createdAt: Date;
   updatedAt: Date;

@@ -1,4 +1,4 @@
-import { SafeUser, User } from "../types/auth";
+import { SafeUser, User } from "../types/auth.types";
 import { query } from "./db";
 
 
@@ -34,7 +34,7 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
     );
 
     return result.rows.length > 0 ? result.rows[0] : null;
-}
+};
 
 
 export const findUserByUsername = async (username: string): Promise<User | null> => {

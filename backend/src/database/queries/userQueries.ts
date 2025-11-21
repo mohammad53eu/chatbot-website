@@ -1,5 +1,5 @@
-import { SafeUser, User } from "../types/auth.types";
-import { query } from "./db";
+import { SafeUser, User } from "../../types/auth.types";
+import { query } from "../db";
 
 
 export const createUser = async (

@@ -1,4 +1,4 @@
-import { emailExists, createUser } from './userQueries';
+import { emailExists, createUser } from './queries/userQueries';
 import { hashPassword } from '../utils/password';
 
 const test = async () => {

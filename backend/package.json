@@ -9,12 +9,19 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^2.0.45",
+    "@ai-sdk/deepseek": "^1.0.29",
+    "@ai-sdk/google": "^2.0.40",
+    "@ai-sdk/openai": "^2.0.68",
+    "@ai-sdk/xai": "^2.0.34",
+    "ai": "^5.0.95",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
+    "ollama-ai-provider-v2": "^1.5.5",
     "pg": "^8.16.3",
     "zod": "^4.1.12"
   },

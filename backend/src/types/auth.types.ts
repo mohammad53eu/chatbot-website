@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id: string;
   email: string;
   username: string;
   password_hash: string;
@@ -15,16 +15,16 @@ export interface RegisterInput {
 }
 
 export interface LoginInput {
-  email: string; // email or username
+  email: string;
   password: string;
 }
 
 export interface AuthTokenPayload {
-  sub: string; // user id
+  sub: string;
 }
 
 export interface SafeUser {
-  id: number;
+  id: string;
   email: string;
   username: string;
   avatar: string | null;

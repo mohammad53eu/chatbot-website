@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { sanitizeInput, validateLogin, validateRegistration } from '../utils/validation';
 import { createUser, emailExists, findUserByEmail, usernameExists } from '../database/queries/userQueries';
 import { comparePasswords, hashPassword } from '../utils/password';

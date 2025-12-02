@@ -1,6 +1,6 @@
 -- Users table for authentication
 CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT uuidv7(),
   email VARCHAR(255) UNIQUE NOT NULL,
   username VARCHAR(50) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- user Indexes for faster lookups
+-- User Indexes for faster lookups
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 
@@ -33,7 +33,7 @@ EXECUTE FUNCTION update_updated_at_column();
 -- PROVIDER CONFIGURATION
 -- ============================================
 CREATE TABLE IF NOT EXISTS provider_configs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid_v7(),
+  id UUID PRIMARY KEY DEFAULT uuidv7(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   provider VARCHAR(50) NOT NULL,
   api_key_encrypted TEXT,
@@ -50,13 +50,11 @@ CREATE TABLE IF NOT EXISTS provider_configs (
 -- ============================================
 
 CREATE TABLE IF NOT EXISTS conversations (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid_v7(),
+  id UUID PRIMARY KEY DEFAULT uuidv7(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   title VARCHAR(255) NOT NULL,
-  model_provider VARCHAR(50),
-  model_name VARCHAR(100),
-  system_prompt TEXT,
-  settings JSONB DEFAULT '{}';
+  system_prompts TEXT,
+  settings JSONB DEFAULT '{}',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -68,11 +66,12 @@ CREATE TABLE IF NOT EXISTS conversations (
 
 
 CREATE TABLE IF NOT EXISTS messages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid_v7(),
-  conversations_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY DEFAULT uuidv7(),
+  conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
   role VARCHAR(20) NOT NULL,
   content TEXT NOT NULL,
   token_count INTEGER,
+  model_provider VARCHAR(50),
   model_used VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -81,8 +80,8 @@ CREATE TABLE IF NOT EXISTS messages (
 -- AVAILABLE MODELS
 -- ============================================
 
-CREATE TABLE available_models (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid_v7(),
+CREATE TABLE IF NOT EXISTS available_models (
+    id UUID PRIMARY KEY DEFAULT uuidv7(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     provider VARCHAR(50) NOT NULL,
     model_name VARCHAR(100) NOT NULL,
@@ -101,9 +100,9 @@ CREATE TABLE available_models (
 -- ============================================
 
 CREATE TABLE IF NOT EXISTS files (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid_v7(),
+  id UUID PRIMARY KEY DEFAULT uuidv7(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  conversations_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
+  conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
   file_name VARCHAR(255) NOT NULL,
   file_type VARCHAR(50),     -- 'upload' or 'generated'
   mime_type VARCHAR(100),
@@ -117,11 +116,11 @@ CREATE TABLE IF NOT EXISTS files (
 -- INDEXES
 -- ============================================
 
-CREATE INDEX idx_conversations_user ON conversations(user_id);
-CREATE INDEX idx_messages_conversation ON messages(conversation_id);
-CREATE INDEX idx_messages_created ON messages(created_at);
-CREATE INDEX idx_files_conversation ON files(conversation_id);
-CREATE INDEX idx_files_user ON files(user_id);
+CREATE INDEX IF NOT EXISTS idx_conversations_user ON conversations(user_id);
+CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id);
+CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at);
+CREATE INDEX IF NOT EXISTS idx_files_conversation ON files(conversation_id);
+CREATE INDEX IF NOT EXISTS idx_files_user ON files(user_id);
 
 
 
@@ -129,8 +128,8 @@ CREATE INDEX idx_files_user ON files(user_id);
 -- UPDATED_AT TRIGGER
 -- ============================================
 
-CREATE TRIGGER update_conversations_updated_at BEFORE UPDATE ON conversations
+CREATE TRIGGER IF NOT EXISTS update_conversations_updated_at BEFORE UPDATE ON conversations
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_model_configs_updated_at BEFORE UPDATE ON model_configs
+CREATE TRIGGER IF NOT EXISTS update_provider_configs_updated_at BEFORE UPDATE ON provider_configs
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

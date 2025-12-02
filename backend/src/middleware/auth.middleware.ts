@@ -21,7 +21,7 @@ export const authMiddleware = async (
 
         const parts = authHeader.split(' ');
 
-        if(parts.length !== 0 || parts[0] !== 'Bearer') {
+        if(parts.length !== 2 || parts[0] !== 'Bearer') {
             res.status(401).json({
                 success: false,
                 error: { message: 'Invalid authorization header format. Use: Bearer <token>' }

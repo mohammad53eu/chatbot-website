@@ -46,7 +46,7 @@ export const findUserByUsername = async (username: string): Promise<User | null>
 };
 
 
-export const findUserById = async (id: number): Promise<SafeUser | null> => {
+export const findUserById = async (id: string): Promise<SafeUser | null> => {
     const result = await query(
         `SELECT id, email, username, avatar_path, created_at FROM users WHERE id = $1`,
     [id]
@@ -66,7 +66,7 @@ export const findUserById = async (id: number): Promise<SafeUser | null> => {
 
 
 export const updateUserAvatar = async (
-    userId: number,
+    user_id: string,
     avatar_path: string
 ): Promise<SafeUser | null> => {
     const result = await query(
@@ -74,7 +74,7 @@ export const updateUserAvatar = async (
         SET avatar_path = $1, updated_at = CURRENT_TIMESTAMP
         WHERE id = $2
         RETURNING id, email, username, avatar_path, created_at`,
-        [avatar_path, userId]
+        [avatar_path, user_id]
     );
 
     if (result.rows.length === 0) return null;

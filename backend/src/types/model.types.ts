@@ -9,6 +9,7 @@ export interface AvailableModel {
   display_name: string;
   supports_vision: boolean;
   supports_streaming: boolean;
+  supports_tools: boolean;
   url: string;
   max_tokens: number | null;
   is_active: boolean;

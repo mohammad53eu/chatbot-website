@@ -2,14 +2,14 @@ import jwt from "jsonwebtoken";
 import { getEnv } from "./env"
 
 interface JwtPayload {
-    userId: number;
+    user_id: string;
     email: string;
 }
 
-export const generateToken = (userId: number, email: string): string => {
+export const generateToken = (user_id: string, email: string): string => {
 
     const payload: JwtPayload = {
-        userId,
+        user_id,
         email,
     };
 

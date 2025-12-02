@@ -2,10 +2,10 @@ import { AvailableModel } from "../../types/model.types";
 import { ProviderName } from "../../types/providers.types";
 import pool from "../db";
 
-
+// load all available models for a specific provider
 export const getAvailableModels = async (
   user_id: string,
-  provider?: ProviderName
+  provider: ProviderName
 ): Promise<AvailableModel[]> => {
   const query = provider
     ? `SELECT * FROM available_models 
@@ -21,6 +21,7 @@ export const getAvailableModels = async (
   return result.rows;
 };
 
+// get a specific model
 export const getModel = async (
   user_id: string,
   provider: ProviderName,
@@ -35,7 +36,7 @@ export const getModel = async (
   return result.rows[0] || null;
 };
 
-
+// add a new model to the table of available models
 export const addModel = async (
   user_id: string,
   provider: ProviderName,
@@ -105,7 +106,7 @@ export const addModel = async (
 //   return result.rows[0];
 // };
 
-
+// deletes a model from the table
 export async function deleteModel(
   user_id: string,
   model_id: string

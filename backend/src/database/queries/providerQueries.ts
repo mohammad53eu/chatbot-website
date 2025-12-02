@@ -42,10 +42,11 @@ export const getDefaultProvider = async (
 };
 
 
+
 export const upsertProviderConfig = async (
   user_id: string,
   provider: ProviderName,
-  apiKeyEncrypted: string | null,
+  apiKeyEncrypted?: string | null,
   isDefault: boolean = false,
   baseURL?: string
 ): Promise<ProviderConfig> => {
@@ -64,16 +65,17 @@ export const upsertProviderConfig = async (
      VALUES ($1, $2, $3, $4, $5)
      ON CONFLICT (user_id, provider) 
      DO UPDATE SET 
-       api_key_encrypted = EXCLUDED.api_key_encrypted,
+       api_key_encrypted = COALESCE(EXCLUDED.api_key_encrypted, provider_configs.api_key_encrypted),
        is_default = EXCLUDED.is_default,
-       base_url = EXCLUDED.base_url,
+       base_url = COALESCE(EXCLUDED.base_url, provider_configs.base_url),
        updated_at = CURRENT_TIMESTAMP
      RETURNING *`,
-    [user_id, provider, apiKeyEncrypted, isDefault, baseURL || null]
+    [user_id, provider, apiKeyEncrypted ?? null, isDefault, baseURL ?? null]
   );
 
   return result.rows[0];
 };
+
 
 
 export const deleteProviderConfig = async (

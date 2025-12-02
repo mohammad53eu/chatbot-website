@@ -1,9 +1,10 @@
-import { ollama } from "ollama-ai-provider-v2";
 import { KEYLESS_PROVIDERS, PROVIDERS, PROVIDER_NAMES } from "../config/providers.config";
 import { ProviderName } from "../types/providers.types";
 import { getProviderConfig } from "../database/queries/providerQueries";
+import { decrypt } from "../utils/encryption";
 
-const getProviderInstance = async (
+//used to get the provider 
+export const getProviderInstance = async (
     user_id: string,
     provider: ProviderName,
     customBaseURL?: string
@@ -31,11 +32,10 @@ const getProviderInstance = async (
     }
 
     const providerFactory = PROVIDERS[provider];
-
+    
     if (!providerFactory) {
     throw new Error(`Unknown provider: ${provider}`);
     }
 
   return providerFactory(apiKey as string, baseURL);
 };
-

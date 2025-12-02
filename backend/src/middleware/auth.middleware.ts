@@ -33,7 +33,7 @@ export const authMiddleware = async (
 
         const decoded = verifyToken(token);
 
-        const user = await findUserById(decoded.userId);
+        const user = await findUserById(decoded.user_id);
 
         if (!user) {
             res.status(401).json({

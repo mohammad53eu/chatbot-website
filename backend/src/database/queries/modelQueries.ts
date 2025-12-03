@@ -45,14 +45,15 @@ export const addModel = async (
   url: string,
   supportsVision: boolean = false,
   supportsStreaming: boolean = true,
+  supports_tools: boolean = false,
   maxTokens?: number
 ): Promise<AvailableModel> => {
   const result = await pool.query(
     `INSERT INTO available_models 
-     (user_id, provider, model_name, display_name, url, supports_vision, supports_streaming, max_tokens)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     (user_id, provider, model_name, display_name, url, supports_vision, supports_streaming, supports_tools, max_tokens)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      RETURNING *`,
-    [user_id, provider, modelName, displayName, url, supportsVision, supportsStreaming, maxTokens || null]
+    [user_id, provider, modelName, displayName, url, supportsVision, supportsStreaming, supports_tools, maxTokens || null]
   );
 
   return result.rows[0];

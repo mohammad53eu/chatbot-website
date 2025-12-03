@@ -206,6 +206,7 @@ export async function addProviderModel(req: Request, res: Response): Promise<voi
             url,
             supports_vision,
             supports_streaming,
+            supports_tools,
             max_tokens
         );
 

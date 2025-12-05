@@ -23,6 +23,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger to call the function before UPDATE
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at
 BEFORE UPDATE ON users
 FOR EACH ROW
@@ -128,8 +129,10 @@ CREATE INDEX IF NOT EXISTS idx_files_user ON files(user_id);
 -- UPDATED_AT TRIGGER
 -- ============================================
 
-CREATE TRIGGER IF NOT EXISTS update_conversations_updated_at BEFORE UPDATE ON conversations
+DROP TRIGGER IF EXISTS update_conversations_updated_at ON conversations;
+CREATE TRIGGER update_conversations_updated_at BEFORE UPDATE ON conversations
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER IF NOT EXISTS update_provider_configs_updated_at BEFORE UPDATE ON provider_configs
+DROP TRIGGER IF EXISTS update_provider_configs_updated_at ON provider_configs;
+CREATE TRIGGER update_provider_configs_updated_at BEFORE UPDATE ON provider_configs
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

@@ -38,7 +38,7 @@ export const getConversation = async (
 ): Promise<Conversation | null> => {
     const result = await pool.query(
         `SELECT * FROM conversations
-        WHERE user_id = $1 AND conversation_id = $2
+        WHERE user_id = $1 AND id = $2
         LIMIT 1`,
         [user_id, conversation_id]
     );

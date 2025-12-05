@@ -3,7 +3,7 @@ import pool from "../db";
 
 
 // get all messages in a conversation
-export const getMessages = async (
+export const getConversationMessages = async (
     conversation_id: string
 ): Promise<Message[]> => {
     const result = await pool.query(

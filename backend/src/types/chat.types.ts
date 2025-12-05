@@ -18,3 +18,15 @@ export interface Message {
     model_used?: string | null;     // only required for assistant messages
     created_at: Date;
 }
+
+export interface  Files{
+    id: string;
+    user_id: string;
+    conversation_id: string;
+    file_name: string;
+    file_type: string;
+    mime_type: string;
+    file_path: string;
+    file_size: number;
+    created_at: Date;
+}

@@ -15,32 +15,55 @@ A Node.js/Express backend with PostgreSQL and JWT-based authentication.
 ## 📁 Project Structure
 
 ```
-backend/
-├── src/
-│   ├── controllers/
-│   │   └── auth.controllers.ts    # Register & login handlers
-│   ├── database/
-│   │   ├── db.ts                   # PostgreSQL connection pool
-│   │   ├── schema.sql              # Database schema
-│   │   ├── testConnection.ts       # DB connection test
-│   │   └── userQueries.ts          # User CRUD operations
-│   ├── middleware/
-│   │   └── auth.middleware.ts      # JWT verification middleware
-│   ├── routes/
-│   │   ├── auth.routes.ts          # Auth route definitions
-│   │   └── index.ts                # Route aggregation
-│   ├── types/
-│   │   ├── auth.types.ts           # User & auth types
-│   │   └── express.d.ts            # Express type extensions
-│   ├── utils/
-│   │   ├── env.ts                  # Environment variable helper
-│   │   ├── jwt.ts                  # JWT generation & verification
-│   │   ├── password.ts             # Password hashing & comparison
-│   │   └── validation.ts           # Input validation utilities
-│   └── server.ts                   # Express app entry point
-├── .env                            # Environment variables
 ├── package.json
+├── pnpm-lock.yaml
+├── README.md
+├── src
+│   ├── config
+│   │   ├── providers.config.ts
+│   │   └── testing.ts
+│   ├── controllers
+│   │   ├── auth.controllers.ts
+│   │   ├── conversationControllers.ts
+│   │   └── providersControllers.ts
+│   ├── database
+│   │   ├── db.ts
+│   │   ├── queries
+│   │   │   ├── conversationQueries.ts
+│   │   │   ├── filesQueries.ts
+│   │   │   ├── messageQueries.ts
+│   │   │   ├── modelQueries.ts
+│   │   │   ├── providerQueries.ts
+│   │   │   └── userQueries.ts
+│   │   ├── schema.sql
+│   │   └── testConnection.ts
+│   ├── middleware
+│   │   └── auth.middleware.ts
+│   ├── models
+│   │   └── builtInModels.ts
+│   ├── routes
+│   │   ├── auth.routes.ts
+│   │   ├── chat.routes.ts
+│   │   ├── index.ts
+│   │   └── provider.routes.ts
+│   ├── server.ts
+│   ├── services
+│   │   └── providers.ts
+│   ├── types
+│   │   ├── ai.ts
+│   │   ├── auth.types.ts
+│   │   ├── chat.types.ts
+│   │   ├── express.d.ts
+│   │   ├── model.types.ts
+│   │   └── providers.types.ts
+│   └── utils
+│       ├── encryption.ts
+│       ├── env.ts
+│       ├── jwt.ts
+│       ├── password.ts
+│       └── validation.ts
 └── tsconfig.json
+
 ```
 
 ## 🛠️ Tech Stack

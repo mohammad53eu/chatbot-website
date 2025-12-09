@@ -60,16 +60,15 @@ export const updateMessageStatus = async (
 
 // deletes a message
 export const deleteMessage = async (
-    conversation_id: string,
     message_id: string
 ): Promise<boolean> => {
+    console.log(message_id, "is the id")
     const result = await pool.query(
         `
         DELETE FROM messages
         WHERE id = $1
-        AND conversation_id = $2
         `,
-        [message_id, conversation_id]
+        [message_id]
     );
 
     return (result.rowCount ?? 0) > 0;

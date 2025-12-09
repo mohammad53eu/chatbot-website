@@ -14,6 +14,8 @@ import { getConversationFiles } from "../database/queries/filesQueries";
 import { getProviderInstance } from "../services/providers";
 import { generateText, streamText, ModelMessage } from "ai";
 import { Message } from "../types/chat.types";
+import { countTokensForString } from "../utils/tokenCounter";
+import { TiktokenModel } from "js-tiktoken";
 
 export async function listConversations(
   req: Request,
@@ -182,12 +184,15 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
       },
     ];
 
-    // 3. Save user message
+    // 3. Count tokens for user message
+    const userTokens = countTokensForString(model_name as TiktokenModel, content);
+
+    // Save user message
     savedUserMessage = await addMessage(
       conversation_id,
       "user",
       content,
-      0,
+      userTokens,
       null,
       null,
       "pending",
@@ -204,15 +209,19 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
       messages: aiMessages,
     });
 
-    // Set headers for streaming text
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-
     let fullResponse = "";
+    let headersSent = false;
 
     // 6. Stream chunks
     for await (const chunk of aiStream.textStream) {
+      // Set headers on first successful chunk
+      if (!headersSent) {
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+        headersSent = true;
+      }
+
       console.log("ai response log:", chunk);
       const text = chunk || "";
       fullResponse += text;
@@ -220,12 +229,26 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
       res.write(`data: ${JSON.stringify({ delta: text })}\n\n`);
     }
 
-    // 7. Save assistant message after stream finishes
+    // Check if stream had errors
+    const finishReason = await aiStream.finishReason;
+    if (finishReason === 'error') {
+      throw new Error('Stream failed with error');
+    }
+
+    // Check if we got any response
+    if (!fullResponse) {
+      throw new Error('No response received from AI model');
+    }
+
+    // 7. Count tokens for assistant response
+    const assistantTokens = countTokensForString(model_name as TiktokenModel, fullResponse);
+
+    // Save assistant message after stream finishes
     await addMessage(
       conversation_id,
       "assistant",
       fullResponse,
-      0, // (replace with token count later)
+      assistantTokens,
       model_provider,
       model_name,
      "processed",
@@ -237,27 +260,32 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
 
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
     res.end();
-  } catch (error) {
+  } catch (error)  {
     console.error("POST /conversations/:id/messages error:", error);
 
+
     if (savedUserMessage?.id) {
-      await deleteMessage(savedUserMessage.id, conversation_id);
+      console.log("saved message::: ",savedUserMessage)
+      await deleteMessage( savedUserMessage.id );
     }
 
-    // If streaming started, still send an error event
-    try {
-      res.write(
-        `data: ${JSON.stringify({ error: "AI processing failed" })}\n\n`,
-      );
-      res.end();
-    } catch (_) {}
-
-    // If streaming didn't start:
+    // If streaming didn't start, send JSON error
     if (!res.headersSent) {
       res.status(500).json({
         success: false,
         error: "Failed to process message",
       });
+      return;
+    }
+
+    // If streaming started, send error event via SSE
+    try {
+      res.write(
+        `data: ${JSON.stringify({ error: "AI processing failed" })}\n\n`,
+      );
+      res.end();
+    } catch (_) {
+      // Response already closed, ignore
     }
   }
 }

@@ -1,5 +1,3 @@
-// src/utils/tokenCounter.ts
-
 import { getEncoding, encodingForModel, Tiktoken, TiktokenModel } from "js-tiktoken";
 
 // Try to resolve the correct encoding for a model, fallback to a default

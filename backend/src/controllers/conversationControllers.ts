@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import {
   addConversation,
+  deleteConversation,
   getAllConversations,
   getConversation,
+  updateConversationTitle,
 } from "../database/queries/conversationQueries";
 import {
   addMessage,
@@ -139,6 +141,7 @@ export async function getConversationDetails(req: Request, res: Response) {
     });
   }
 }
+
 
 export async function sendMessage(req: Request, res: Response): Promise<void> {
   
@@ -287,5 +290,69 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
     } catch (_) {
       // Response already closed, ignore
     }
+  }
+}
+
+export async function renameCoversation(req: Request, res: Response): Promise<void>{
+
+  try {
+    const user_id = req.user?.id
+    const { id: conversation_id } = req.params;
+
+    const { title } = req.body;
+
+    if (!user_id) {
+      res.status(400).json({ success: false, error: "User not authenticated" });
+      return;
+    }
+
+    const newTitle = await updateConversationTitle(user_id, conversation_id, title);
+
+    if(!newTitle){
+      res.status(400).json({
+        success: false,
+        error: "changing title failed, try again"
+      })
+    }
+
+    console.log(newTitle);
+    res.status(200).json({
+      success: true,
+      data: newTitle
+    })
+
+
+  } catch (error) {
+    console.error("PATCH /conversations/:id error:", error);
+    res.status(500).json({
+      success: false,
+      error: "failed to update title from database",
+    });
+  }
+};
+
+export async function deleteUserConversation(req: Request, res: Response): Promise<void>{
+  try {
+    const user_id = req.user?.id;
+    const { id: conversation_id } = req.params;
+
+    if (!user_id) {
+      res.status(400).json({ success: false, error: "User not authenticated" });
+      return;
+    }
+
+    const deletion = await deleteConversation(user_id, conversation_id);
+
+    res.status(200).json({
+      success: true,
+      message: "the conversation deleted successfully"
+    })
+
+  } catch (error) {
+    console.error("DELETE /conversations/:id error:", error);
+    res.status(500).json({
+      success: false,
+      error: "failed to delete the conversation from database",
+    });
   }
 }

@@ -16,6 +16,8 @@ export interface Message {
     token_count: number;
     model_provider?: string | null; // only required for assistant messages
     model_used?: string | null;     // only required for assistant messages
+    status: 'pending' | 'processed';
+    error: string | null;
     created_at: Date;
 }
 

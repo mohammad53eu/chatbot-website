@@ -6,11 +6,14 @@ import {
 } from "../database/queries/conversationQueries";
 import {
   addMessage,
+  deleteMessage,
   getConversationMessages,
+  updateMessageStatus,
 } from "../database/queries/messageQueries";
 import { getConversationFiles } from "../database/queries/filesQueries";
 import { getProviderInstance } from "../services/providers";
 import { generateText, streamText, ModelMessage } from "ai";
+import { Message } from "../types/chat.types";
 
 export async function listConversations(
   req: Request,
@@ -136,9 +139,12 @@ export async function getConversationDetails(req: Request, res: Response) {
 }
 
 export async function sendMessage(req: Request, res: Response): Promise<void> {
+  
+  let savedUserMessage: Message | null = null;
+  const { id: conversation_id } = req.params;
+
   try {
     const user_id = req.user?.id;
-    const { id: conversation_id } = req.params;
 
     if (!user_id) {
       res.status(400).json({ success: false, error: "User not authenticated" });
@@ -177,14 +183,17 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
     ];
 
     // 3. Save user message
-    const savedUserMessage = await addMessage(
+    savedUserMessage = await addMessage(
       conversation_id,
       "user",
       content,
-      0, //todo: track token count later
+      0,
       null,
       null,
-    );
+      "pending",
+      null
+);
+
 
     // 4. Get provider instance
     const provider = await getProviderInstance(user_id, model_provider);
@@ -219,12 +228,21 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
       0, // (replace with token count later)
       model_provider,
       model_name,
+     "processed",
+     null
     );
+
+    // update the status of the message
+    await updateMessageStatus(savedUserMessage.id, "processed", null);
 
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
     res.end();
   } catch (error) {
     console.error("POST /conversations/:id/messages error:", error);
+
+    if (savedUserMessage?.id) {
+      await deleteMessage(savedUserMessage.id, conversation_id);
+    }
 
     // If streaming started, still send an error event
     try {

@@ -74,6 +74,8 @@ CREATE TABLE IF NOT EXISTS messages (
   token_count INTEGER,
   model_provider VARCHAR(50),
   model_used VARCHAR(100),
+  status TEXT NOT NULL DEFAULT 'pending',
+  error TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

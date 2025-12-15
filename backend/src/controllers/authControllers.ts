@@ -3,6 +3,7 @@ import { sanitizeInput, validateLogin, validateRegistration } from '../utils/val
 import { createUser, emailExists, findUserByEmail, usernameExists } from '../database/queries/userQueries';
 import { comparePasswords, hashPassword } from '../utils/password';
 import { generateToken } from '../utils/jwt';
+import { AuthenticationError, ConflictError, DatabaseError, ValidationError } from '../utils/customError';
 
 
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -10,11 +11,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         const { email, username, password } = req.body;
 
         if(!email || !username || !password) {
-            res.status(400).json({
-                success: false,
-                error: { message: 'Email, username, and password are required'}
-            });
-            return;
+            throw new ValidationError("Email, username, and password are required");
         }
 
         const sanitizedEmail = sanitizeInput(email.toLowerCase());
@@ -22,32 +19,24 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
         const validation = validateRegistration(sanitizedEmail, sanitizedUsername, password);
         if(!validation.isValid){
-            res.status(400).json({
-                success: false,
-                error: { message: validation.message }
-            });
-            return;
+            throw new ValidationError(validation.message);
         }
 
         if (await emailExists(sanitizedEmail)) {
-            res.status(409).json({
-            success: false,
-            error: { message: 'Email already registered' }
-        });
-        return;
+            throw new ConflictError("Email already registered");
         }
 
         if (await usernameExists(sanitizedUsername)) {
-            res.status(409).json({
-                success: false,
-                error: { message: 'Username already taken' }
-            });
-            return;
+            throw new ConflictError("Username already taken");
         }
 
         const passwordHash = await hashPassword(password);
 
         const user = await createUser(sanitizedEmail, sanitizedUsername, passwordHash);
+
+        if(!user){
+            throw new DatabaseError();
+        }
 
         const token = generateToken(user.id, user.email);
 
@@ -63,6 +52,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
                 token
             }
         });
+        
     } catch (error) {
         console.error('Registeration error: ', error);
         res.status(500).json({
@@ -78,11 +68,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         const {email, password} = req.body;
 
         if (!email || !password) {
-            res.status(400).json({
-                success: false,
-                error: { message: 'Email and password are required' }
-            });
-            return;
+            throw new ValidationError("Email and password are required");
         }
 
         const sanitizedEmail = sanitizeInput(email.toLowerCase());
@@ -90,31 +76,20 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         const validation = validateLogin(sanitizedEmail, password);
 
         if (!validation.isValid) {
-            res.status(400).json({
-                success: false,
-                error: { message: validation.message }
-        });
-        return;
+            throw new ValidationError(validation.message);
+
         }
 
         const user = await findUserByEmail(sanitizedEmail);
 
         if (!user) {
-            res.status(401).json({
-                success: false,
-                error: { message: 'Invalid email or password' }
-            });
-            return;
+            throw new AuthenticationError('Invalid email or password');
         }
 
         const isPasswordValid = await comparePasswords(password, user.password_hash);
 
         if(!isPasswordValid) {
-            res.status(401).json({
-                success: false,
-                error: { message: 'Invalid email or password'}
-            });
-            return;
+            throw new AuthenticationError('Invalid email or password');
         }
 
         const token = generateToken(user.id, user.email);

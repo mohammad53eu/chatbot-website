@@ -5,6 +5,7 @@ import { builtinModels } from "../models/builtInModels";
 import { AvailableModel } from "../types/model.types";
 import { addModel, deleteModel, getAvailableModels } from "../database/queries/modelQueries";
 import { ProviderName } from "../types/providers.types";
+import { AuthenticationError, ValidationError, NotFoundError, ConflictError } from "../utils/customError";
 
 // for database errors: might move this to another file that handles errors.
 function isDatabaseError(err: unknown): err is { code: string } {
@@ -19,21 +20,13 @@ export async function getProvider(req: Request,res: Response): Promise<void> {
         const user_id = req.user?.id;
 
         if(!user_id || !provider){
-            res.status(400).json({
-                success: false,
-                error: { message: 'no user_id or provider sent'}
-            });
-            return;
+            throw new ValidationError('User ID and provider are required');
         }
 
         const providerConfig = await getProviderConfig(user_id, provider);
         
         if (!providerConfig){
-            res.status(400).json({
-                success: false,
-                error: { message: 'there is no config for this provider, add one'}
-            })
-            return;
+            throw new NotFoundError('No configuration found for this provider');
         }
 
         res.status(200).json({
@@ -59,11 +52,7 @@ export async function upsertProvider(req: Request, res: Response): Promise<void>
         const user_id = req.user?.id;
 
         if (!user_id || !provider) {
-            res.status(400).json({
-                success: false,
-                error: { message: 'user_id and provider are required.' }
-            });
-            return;
+            throw new ValidationError('User ID and provider are required');
         }
 
         // encrypt the API key only if a new one was provided
@@ -112,21 +101,13 @@ export async function listProviderModels(req: Request, res: Response): Promise<v
 
 
         if (!provider) {
-            res.status(400).json({
-                success: false,
-                error: { message: "provider is required" } 
-            });
-            return;
+            throw new ValidationError("Provider is required");
         }
 
         // type guard to ensure provider is a valid ProviderName
         const validProviders = Object.keys(builtinModels);
         if (!validProviders.includes(provider)) {
-            res.status(400).json({
-                success: false,
-                error: { message: "Invalid provider" }
-            });
-            return;
+            throw new ValidationError("Invalid provider");
         }
 
         // load builtin models (from src/models/builtInModels.ts):
@@ -172,11 +153,7 @@ export async function addProviderModel(req: Request, res: Response): Promise<voi
         const user_id = req.user?.id;
 
         if(!user_id){
-            res.status(400).json({
-                success: false,
-                error: { message: "user_id isn't there, try again" }
-            });
-            return;
+            throw new AuthenticationError();
         }
         const {
             model_name,
@@ -189,11 +166,7 @@ export async function addProviderModel(req: Request, res: Response): Promise<voi
         } = req.body;
 
         if (!model_name || !display_name) {
-            res.status(400).json({
-                success: false,
-                error: { message: "model_name and display_name are required" }
-            });
-            return;
+            throw new ValidationError("Model name and display name are required");
         }
 
         const newURl: string | null = url;
@@ -220,11 +193,7 @@ export async function addProviderModel(req: Request, res: Response): Promise<voi
     } catch (error) {
         // handle unique constraint violation
         if (isDatabaseError(error) && error.code === "23505") {
-            res.status(409).json({
-                success: false,
-                error: { message: "Model with this name already exists for this provider" }
-            });
-            return;
+            throw new ConflictError("Model with this name already exists for this provider");
         }
         
         console.error('Error adding provider model:', error);
@@ -242,29 +211,17 @@ export async function deleteProviderModel(req: Request, res: Response): Promise<
     const model_id = req.params.modelId;
 
     if (!model_id) {
-      res.status(400).json({
-        success: false,
-        error: { message: "modelId is required" }
-      });
-      return;
+      throw new ValidationError("Model ID is required");
     }
 
     if(!user_id){
-        res.status(400).json({
-            success: false,
-            error: { message: "user_id isn't tho98ere, try again" }
-        });
-        return;
+        throw new AuthenticationError();
     }
 
     const deleted = await deleteModel(user_id, model_id);
 
     if (!deleted) {
-      res.status(404).json({
-        success: false,
-        error: { message: "Model not found or not owned by user" }
-      });
-      return;
+      throw new NotFoundError("Model not found or not owned by user");
     }
 
     res.status(200).json({

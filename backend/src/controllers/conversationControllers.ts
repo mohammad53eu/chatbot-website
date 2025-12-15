@@ -8,6 +8,7 @@ import {
 } from "../database/queries/conversationQueries";
 import { getConversationMessages } from "../database/queries/messageQueries";
 import { getConversationFiles } from "../database/queries/filesQueries";
+import { AuthenticationError, NotFoundError, DatabaseError } from "../utils/customError";
 
 export async function listConversations(
   req: Request,
@@ -17,11 +18,7 @@ export async function listConversations(
     const user_id = req.user?.id;
 
     if (!user_id) {
-      res.status(400).json({
-        success: false,
-        error: "User not authenticated",
-      });
-      return;
+      throw new AuthenticationError();
     }
 
     const conversations = await getAllConversations(user_id);
@@ -46,8 +43,7 @@ export async function createConversation(
   try {
     const user_id = req.user?.id;
     if (!user_id) {
-      res.status(400).json({ success: false, error: "User not authenticated" });
-      return;
+      throw new AuthenticationError();
     }
 
     const { settings, system_prompts } = req.body;
@@ -95,21 +91,13 @@ export async function getConversationDetails(req: Request, res: Response) {
     const conversation_id = req.params.id;
 
     if (!user_id) {
-      res.status(400).json({
-        success: false,
-        error: "User not authenticated",
-      });
-      return;
+      throw new AuthenticationError();
     }
 
     const conversation = await getConversation(user_id, conversation_id);
 
     if (!conversation) {
-      res.status(404).json({
-        success: false,
-        error: "Conversation not found",
-      });
-      return;
+      throw new NotFoundError("Conversation not found");
     }
 
     const [messages, files] = await Promise.all([
@@ -144,17 +132,13 @@ export async function renameCoversation(req: Request, res: Response): Promise<vo
     const { title } = req.body;
 
     if (!user_id) {
-      res.status(400).json({ success: false, error: "User not authenticated" });
-      return;
+      throw new AuthenticationError();
     }
 
     const newTitle = await updateConversationTitle(user_id, conversation_id, title);
 
     if(!newTitle){
-      res.status(400).json({
-        success: false,
-        error: "changing title failed, try again"
-      })
+      throw new DatabaseError("Failed to update conversation title");
     }
 
     console.log(newTitle);
@@ -179,8 +163,7 @@ export async function deleteUserConversation(req: Request, res: Response): Promi
     const { id: conversation_id } = req.params;
 
     if (!user_id) {
-      res.status(400).json({ success: false, error: "User not authenticated" });
-      return;
+      throw new AuthenticationError();
     }
 
     const deletion = await deleteConversation(user_id, conversation_id);

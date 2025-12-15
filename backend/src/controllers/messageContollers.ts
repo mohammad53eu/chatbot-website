@@ -6,34 +6,34 @@ import { countTokensForString } from "../utils/tokenCounter";
 import { TiktokenModel } from "js-tiktoken";
 import { getProviderInstance } from "../services/providers";
 import { streamText } from "ai";
+import { AuthenticationError, MessageError, NotFoundError, ProviderError } from "../utils/customError";
+
 
 export async function sendMessage(req: Request, res: Response): Promise<void> {
   
+  // declared here so it can be used in "catch"
   let savedUserMessage: Message | null = null;
   const { id: conversation_id } = req.params;
 
   try {
+    // get from auth middleware
     const user_id = req.user?.id;
 
     if (!user_id) {
-      res.status(400).json({ success: false, error: "User not authenticated" });
-      return;
+      throw new AuthenticationError();
     }
 
     const { content, model_provider, model_name } = req.body;
 
+    // double check for content
     if (!content || typeof content !== "string") {
-      res
-        .status(400)
-        .json({ success: false, error: "Message content required" });
-      return;
+      throw new MessageError();
     }
 
     // 1. Validate conversation ownership
     const convo = await getConversation(user_id, conversation_id);
     if (!convo) {
-      res.status(404).json({ success: false, error: "Conversation not found" });
-      return;
+      throw new NotFoundError("Conversation not found");
     }
 
     // 2. Load conversation history
@@ -99,12 +99,12 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
     // Check if stream had errors
     const finishReason = await aiStream.finishReason;
     if (finishReason === 'error') {
-      throw new Error('Stream failed with error');
+      throw new ProviderError("Stream failed with error");
     }
 
     // Check if we got any response
     if (!fullResponse) {
-      throw new Error('No response received from AI model');
+      throw new ProviderError("No response received from AI model");
     }
 
     // 7. Count tokens for assistant response
@@ -138,22 +138,10 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
 
     // If streaming didn't start, send JSON error
     if (!res.headersSent) {
-      res.status(500).json({
-        success: false,
-        error: "Failed to process message",
-      });
-      return;
+      throw new Error("SSE headers error");
     }
 
-    // If streaming started, send error event via SSE
-    try {
-      res.write(
-        `data: ${JSON.stringify({ error: "AI processing failed" })}\n\n`,
-      );
-      res.end();
-    } catch (_) {
-      // Response already closed, ignore
-    }
+    
   }
 }
 
@@ -165,11 +153,7 @@ export async function deleteUserMessage(req: Request, res: Response): Promise<vo
     const {msgId: message_id} = req.params;
 
     if(!user_id){
-      res.status(400).json({
-        success: false,
-        error: "user not authenticated"
-      })
-      return;
+      throw new AuthenticationError();
     }
 
     const deletion = await deleteMessage(message_id);

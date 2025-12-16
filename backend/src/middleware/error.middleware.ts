@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { CustomError } from "../utils/customError";
+import { ConflictError, CustomError } from "../utils/customError";
+
+function isDatabaseError(err: unknown): err is { code: string } {
+    return typeof err === 'object' && err !== null && 'code' in err;
+}
 
 export function errorHandler(
     error: Error,
@@ -20,6 +24,15 @@ export function errorHandler(
             name: error.name,
             error: error.message
         })
+        return;
+    }
+
+    if (isDatabaseError(error) && error.code === "23505") {
+        res.status(409).json({
+            success: false,
+            name: "ConflictError",
+            error: error.message
+        })
     }
 
     // if the above don't work
@@ -27,5 +40,4 @@ export function errorHandler(
         success: false,
         error: "An error occurred.."
     })
-
 }

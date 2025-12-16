@@ -11,10 +11,8 @@ router.get('/conversations/:id', getConversationDetails)    // get a specific co
 router.patch('/conversations/:id', renameCoversation)  // rename a conversation
 router.delete('/conversations/:id', deleteUserConversation )  // delete a conversation
 
-router.get('/conversations/:id/messages', )  // get the messages of a conversation (already handled in GET /conversations/:id but i am leaving this for now)
 router.post('/conversations/:id/messages', sendMessage)  // send a messages
 router.delete('/conversations/:id/messages/:msgId', deleteUserMessage)  // delete a message
 
 
-router.post('/completions', ) // this is for testing
 export default router;

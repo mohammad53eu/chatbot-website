@@ -27,6 +27,7 @@ export function errorHandler(
         return;
     }
 
+    // this is special case for a postgresSQL error
     if (isDatabaseError(error) && error.code === "23505") {
         res.status(409).json({
             success: false,

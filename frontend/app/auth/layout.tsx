@@ -1,18 +1,44 @@
-import { Outlet, Link } from "react-router";
+// frontend/app/auth/layout.tsx
+// frontend/app/auth/layout.tsx
+import { Outlet } from "react-router-dom";
 
 export default function AuthLayout() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6 border rounded-lg p-6 shadow-sm bg-white dark:bg-gray-900">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Auth</h1>
-          <nav className="text-sm space-x-3">
-            <Link to="/login" className="underline hover:text-amber-500">Login</Link>
-            <Link to="/register" className="underline hover:text-amber-500">Register</Link>
-          </nav>
-        </div>
-        <Outlet />
-      </div>
+    <div className="min-h-screen bg-[#E5E5E5] flex items-center justify-center p-4">
+      <Outlet />
     </div>
   );
 }
+/*import { Outlet, Link, useLocation } from "react-router-dom";
+
+export default function AuthLayout() {
+  const location = useLocation();
+
+  return (
+    <div className="min-h-screen bg-[#E5E5E5] p-2">
+      <div className="flex justify-end pt-2">
+        {location.pathname === '/login' ? (
+          <Link
+            to="/register"
+            className="px-3 py-1 text-sm font-bold text-[#2A0B5C] bg-[#F0EFEF] border border-[#999] rounded hover:bg-[#e0e0e0]"
+          >
+            Register
+          </Link>
+        ) : (
+          <Link
+            to="/login"
+            className="px-3 py-1 text-sm font-bold text-[#2A0B5C] bg-[#F0EFEF] border border-[#999] rounded hover:bg-[#e0e0e0]"
+          >
+            Login
+          </Link>
+        )}
+      </div>
+
+      <div className="flex justify-center mt-12">
+        <div className="w-full max-w-sm rounded-lg bg-[#D9D9D9] shadow-md">
+          <Outlet />
+        </div>
+      </div>
+    </div>
+  );
+}*/

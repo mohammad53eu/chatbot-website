@@ -1,21 +1,14 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 html,
 body {
   @apply bg-[#E5E5E5] text-[#333];
-  /* Disable dark mode override */
-  color-scheme: light;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Optional: prevent Tailwind's dark mode classes from activating */
-@media (prefers-color-scheme: dark) {
-  html,
-  body {
-    @apply bg-[#E5E5E5] text-[#333];
-  }
+.dark html,
+.dark body {
+  @apply bg-slate-900 text-slate-100;
 }

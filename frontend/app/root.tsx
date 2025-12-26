@@ -7,6 +7,8 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+import { ThemeProvider } from "./context/ThemeContext"; // Add this
+
 import type { Route } from "./+types/root";
 import "./app.css";
 
@@ -42,7 +44,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <ThemeProvider>
+      <Outlet />
+    </ThemeProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
@@ -62,12 +68,12 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
+    <main className="pt-16 p-4 container mx-auto dark:bg-slate-900 dark:text-slate-100">
+      <h1 className="text-4xl font-bold text-gray-900 dark:text-slate-100">{message}</h1>
+      <p className="mt-4 text-lg text-gray-600 dark:text-slate-300">{details}</p>
       {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
+        <pre className="w-full p-4 mt-6 overflow-x-auto bg-gray-100 dark:bg-slate-800 rounded-xl">
+          <code className="text-sm text-gray-800 dark:text-slate-200">{stack}</code>
         </pre>
       )}
     </main>

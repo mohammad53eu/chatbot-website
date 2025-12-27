@@ -1,0 +1,27 @@
+coverage
+
+# dependencies
+node_modules
+npm-debug.log
+
+# build output
+dist
+
+# env files
+.env
+.env.*
+
+# logs
+*.log
+
+# docs / markdown
+*.md
+
+# git
+.git
+.gitignore
+
+# OS / editor junk
+.DS_Store
+.vscode
+.idea

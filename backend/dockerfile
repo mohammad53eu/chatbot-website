@@ -1,0 +1,46 @@
+# =========================
+# Base image
+# =========================
+FROM node:20-alpine AS base
+
+WORKDIR /app
+
+# Enable pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# =========================
+# Dependencies
+# =========================
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install
+
+# =========================
+# Build
+# =========================
+FROM base AS build
+
+COPY . .
+
+# Compile TypeScript -> dist/
+RUN pnpm run build
+
+# =========================
+# Runtime
+# =========================
+FROM node:20-alpine AS runtime
+
+WORKDIR /app
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copy only runtime essentials
+COPY --from=build /app/dist ./dist
+COPY package.json pnpm-lock.yaml ./
+
+# Install only prod deps
+RUN pnpm install --prod
+
+EXPOSE 4000
+
+# Uses the existing script
+CMD ["pnpm", "start"]

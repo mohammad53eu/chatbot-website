@@ -9,8 +9,8 @@ interface SidebarProps {
   onClose: () => void;
   onCreateConversation: () => void;
   onSelectConversation: (id: string) => void;
-  onRenameConversation: (id: string, newTitle: string) => void;  // NEW
-  onDeleteConversation: (id: string) => void;                   // NEW
+  onRenameConversation: (id: string, newTitle: string) => void;  
+  onDeleteConversation: (id: string) => void;                   
 }
 
 export default memo(function ChatSidebar({ 

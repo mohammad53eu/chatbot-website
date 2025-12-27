@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { getEnv } from "./env";
+import { getEnv } from "./env.js";
 /**
  * Load and validate the master encryption key from env.
  *

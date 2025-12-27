@@ -1,5 +1,5 @@
-import { emailExists, createUser } from './queries/userQueries';
-import { hashPassword } from '../utils/password';
+import { emailExists, createUser } from './queries/userQueries.js';
+import { hashPassword } from '../utils/password.js';
 
 const test = async () => {
   // Check if test email exists

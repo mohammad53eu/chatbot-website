@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { sanitizeInput, validateLogin, validateRegistration } from '../utils/validation';
-import { createUser, emailExists, findUserByEmail, usernameExists } from '../database/queries/userQueries';
-import { comparePasswords, hashPassword } from '../utils/password';
-import { generateToken } from '../utils/jwt';
-import { AuthenticationError, ConflictError, DatabaseError, ValidationError } from '../utils/customError';
+import { sanitizeInput, validateLogin, validateRegistration } from '../utils/validation.js';
+import { createUser, emailExists, findUserByEmail, usernameExists } from '../database/queries/userQueries.js';
+import { comparePasswords, hashPassword } from '../utils/password.js';
+import { generateToken } from '../utils/jwt.js';
+import { AuthenticationError, ConflictError, DatabaseError, ValidationError } from '../utils/customError.js';
 
 
 export const register = async (req: Request, res: Response): Promise<void> => {

@@ -1,4 +1,4 @@
-import { PROVIDERS } from "./providers.config";
+import { PROVIDERS } from "./providers.config.js";
 import { generateText } from 'ai';
 
 const provider = PROVIDERS['ollama']();

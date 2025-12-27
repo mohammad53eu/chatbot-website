@@ -26,7 +26,7 @@ export default function ChatPage() {
 const [showProviderMenuRegen, setShowProviderMenuRegen] = useState(false);
 const [regenTargetIndex, setRegenTargetIndex] = useState<number | null>(null);
 
-// In your main chat page (where ChatSidebar is used)
+
 const handleRenameConversation = async (conversationId: string, newTitle: string) => {
   try {
     const response = await fetch(`http://localhost:4000/api/chat/conversations/${conversationId}`, {
@@ -40,7 +40,7 @@ const handleRenameConversation = async (conversationId: string, newTitle: string
 
     if (!response.ok) throw new Error('Failed to rename');
 
-    // Optimistically update UI
+
     setConversations(prev => 
       prev.map(conv => conv.id === conversationId ? { ...conv, title: newTitle } : conv)
     );

@@ -1,7 +1,7 @@
-import { KEYLESS_PROVIDERS, PROVIDERS } from "../config/providers.config";
-import { ProviderName } from "../types/providers.types";
-import { getProviderConfig } from "../database/queries/providerQueries";
-import { decrypt } from "../utils/encryption";
+import { KEYLESS_PROVIDERS, PROVIDERS } from "../config/providers.config.js";
+import { ProviderName } from "../types/providers.types.js";
+import { getProviderConfig } from "../database/queries/providerQueries.js";
+import { decrypt } from "../utils/encryption.js";
 
 //used to get the provider
 export const getProviderInstance = async (

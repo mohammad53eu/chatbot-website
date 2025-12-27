@@ -1,4 +1,4 @@
-import { ProviderName } from "./providers.types";
+import { ProviderName } from "./providers.types.js";
 
 
 export interface AvailableModel {

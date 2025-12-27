@@ -1,5 +1,5 @@
 import { Pool, QueryResult } from "pg";
-import { getEnv } from "../utils/env";
+import { getEnv } from "../utils/env.js";
 
 const pool = new Pool({
     host: getEnv("DB_HOST") || 'localhost',

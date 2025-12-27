@@ -5,10 +5,10 @@ import {
   getAllConversations,
   getConversation,
   updateConversationTitle,
-} from "../database/queries/conversationQueries";
-import { getConversationMessages } from "../database/queries/messageQueries";
-import { getConversationFiles } from "../database/queries/filesQueries";
-import { AuthenticationError, NotFoundError, DatabaseError } from "../utils/customError";
+} from "../database/queries/conversationQueries.js";
+import { getConversationMessages } from "../database/queries/messageQueries.js";
+import { getConversationFiles } from "../database/queries/filesQueries.js";
+import { AuthenticationError, NotFoundError, DatabaseError } from "../utils/customError.js";
 
 
 export async function listConversations( req: Request, res: Response ): Promise<void> {

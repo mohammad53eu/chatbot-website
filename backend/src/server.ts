@@ -2,9 +2,9 @@ import 'dotenv/config';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
-import { getPort } from './utils/env';
-import routes from './routes';
-import { errorHandler } from './middleware/error.middleware';
+import { getPort } from './utils/env.js';
+import routes from './routes/index.js';
+import { errorHandler } from './middleware/error.middleware.js';
 const app = express();
 
 app.use(helmet());

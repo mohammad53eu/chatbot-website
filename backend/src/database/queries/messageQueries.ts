@@ -1,5 +1,5 @@
-import { Message } from "../../types/chat.types";
-import pool from "../db";
+import { Message } from "../../types/chat.types.js";
+import pool from "../db.js";
 
 
 // get all messages in a conversation

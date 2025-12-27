@@ -1,4 +1,4 @@
-// app/routes/MessageArea.tsx (or wherever your ChatSidebar is)
+// app/routes/MessageArea.tsx
 import { memo, useCallback, useRef, useEffect } from 'react';
 import type { Message } from './types/chat'; // Adjust import path
 
@@ -148,6 +148,7 @@ export default memo(function MessageArea({
                   <div className="mb-4 text-base text-gray-900 dark:text-slate-100 leading-relaxed pr-12">
                     <div dangerouslySetInnerHTML={{ __html: renderMessageContent(msg.content) }} />
                   </div>
+                  {/*name*/}
                   <div className="flex items-center justify-start gap-2 opacity-60 dark:opacity-70 group-hover:opacity-100 transition-opacity duration-200">
                     <span className="text-xs text-gray-500 dark:text-slate-400 font-medium bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded-full">
                       {(msg.provider || provider).toUpperCase()}

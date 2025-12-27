@@ -1,6 +1,6 @@
-import { AvailableModel } from "../../types/model.types";
-import { ProviderName } from "../../types/providers.types";
-import pool from "../db";
+import { AvailableModel } from "../../types/model.types.js";
+import { ProviderName } from "../../types/providers.types.js";
+import pool from "../db.js";
 
 // load all available models for a specific provider
 export const getAvailableModels = async (

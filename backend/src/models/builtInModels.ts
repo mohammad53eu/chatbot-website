@@ -1,5 +1,5 @@
-import { AvailableModel } from "../types/model.types";
-import { ProviderName } from "../types/providers.types";
+import { AvailableModel } from "../types/model.types.js";
+import { ProviderName } from "../types/providers.types.js";
 
 
 export const builtinModels: Record<ProviderName, Omit<AvailableModel, "id" | "user_id">[]> = {

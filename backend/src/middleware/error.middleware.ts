@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ConflictError, CustomError } from "../utils/customError";
+import { ConflictError, CustomError } from "../utils/customError.js";
 
 function isDatabaseError(err: unknown): err is { code: string } {
     return typeof err === 'object' && err !== null && 'code' in err;

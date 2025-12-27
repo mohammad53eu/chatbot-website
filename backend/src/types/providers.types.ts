@@ -1,4 +1,4 @@
-import { PROVIDER_NAMES } from "../config/providers.config";
+import { PROVIDER_NAMES } from "../config/providers.config.js";
 
 export type ProviderName = typeof PROVIDER_NAMES[number];
 

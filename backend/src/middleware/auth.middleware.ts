@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '../utils/jwt';
-import { findUserById } from '../database/queries/userQueries';
+import { verifyToken } from '../utils/jwt.js';
+import { findUserById } from '../database/queries/userQueries.js';
 
 
 export const authMiddleware = async (

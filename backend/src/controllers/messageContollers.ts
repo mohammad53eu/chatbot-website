@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { Message } from "../types/chat.types";
-import { getConversation } from "../database/queries/conversationQueries";
-import { addMessage, deleteMessage, getConversationMessages, updateMessageStatus } from "../database/queries/messageQueries";
-import { countTokensForString } from "../utils/tokenCounter";
+import { Message } from "../types/chat.types.js";
+import { getConversation } from "../database/queries/conversationQueries.js";
+import { addMessage, deleteMessage, getConversationMessages, updateMessageStatus } from "../database/queries/messageQueries.js";
+import { countTokensForString } from "../utils/tokenCounter.js";
 import { TiktokenModel } from "js-tiktoken";
-import { getProviderInstance } from "../services/providers";
+import { getProviderInstance } from "../services/providers.js";
 import { streamText } from "ai";
-import { AuthenticationError, MessageError, NotFoundError, ProviderError } from "../utils/customError";
+import { AuthenticationError, MessageError, NotFoundError, ProviderError } from "../utils/customError.js";
 
 
 export async function sendMessage(req: Request, res: Response): Promise<void> {

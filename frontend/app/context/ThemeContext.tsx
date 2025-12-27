@@ -1,6 +1,6 @@
 // context/ThemeContext.tsx
 import { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';  // ✅ TYPE-ONLY IMPORT
+import type { ReactNode } from 'react';
 
 interface ThemeContextType {
   isDark: boolean;
@@ -10,7 +10,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 interface ThemeProviderProps {
-  children: ReactNode;  // ✅ Now works
+  children: ReactNode;
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {

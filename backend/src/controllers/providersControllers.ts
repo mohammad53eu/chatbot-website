@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { getProviderConfig, upsertProviderConfig } from "../database/queries/providerQueries";
-import { encrypt } from "../utils/encryption";
-import { builtinModels } from "../models/builtInModels";
-import { AvailableModel } from "../types/model.types";
-import { addModel, deleteModel, getAvailableModels } from "../database/queries/modelQueries";
-import { ProviderName } from "../types/providers.types";
-import { AuthenticationError, ValidationError, NotFoundError, ConflictError } from "../utils/customError";
+import { getProviderConfig, upsertProviderConfig } from "../database/queries/providerQueries.js";
+import { encrypt } from "../utils/encryption.js";
+import { builtinModels } from "../models/builtInModels.js";
+import { AvailableModel } from "../types/model.types.js";
+import { addModel, deleteModel, getAvailableModels } from "../database/queries/modelQueries.js";
+import { ProviderName } from "../types/providers.types.js";
+import { AuthenticationError, ValidationError, NotFoundError } from "../utils/customError.js";
 
 
 

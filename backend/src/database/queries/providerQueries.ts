@@ -1,5 +1,5 @@
-import { ProviderConfig, ProviderName } from "../../types/providers.types";
-import pool from "../db";
+import { ProviderConfig, ProviderName } from "../../types/providers.types.js";
+import pool from "../db.js";
 
 export const getProviderConfig = async (
     user_id: string,

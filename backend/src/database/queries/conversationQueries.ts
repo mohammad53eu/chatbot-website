@@ -1,5 +1,5 @@
-import { Conversation } from "../../types/chat.types";
-import pool from "../db";
+import { Conversation } from "../../types/chat.types.js";
+import pool from "../db.js";
 
 // get all conversations from database
 export const getAllConversations = async (

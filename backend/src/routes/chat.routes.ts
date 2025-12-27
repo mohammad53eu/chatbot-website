@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { createConversation, deleteUserConversation, getConversationDetails, listConversations, renameCoversation } from '../controllers/conversationControllers';
-import { deleteUserMessage, sendMessage } from '../controllers/messageContollers';
+import { createConversation, deleteUserConversation, getConversationDetails, listConversations, renameCoversation } from '../controllers/conversationControllers.js';
+import { deleteUserMessage, sendMessage } from '../controllers/messageContollers.js';
 
 const router = Router();
 

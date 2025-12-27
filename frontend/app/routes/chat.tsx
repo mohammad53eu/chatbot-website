@@ -26,6 +26,54 @@ export default function ChatPage() {
 const [showProviderMenuRegen, setShowProviderMenuRegen] = useState(false);
 const [regenTargetIndex, setRegenTargetIndex] = useState<number | null>(null);
 
+// In your main chat page (where ChatSidebar is used)
+const handleRenameConversation = async (conversationId: string, newTitle: string) => {
+  try {
+    const response = await fetch(`http://localhost:4000/api/chat/conversations/${conversationId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ title: newTitle }),
+    });
+
+    if (!response.ok) throw new Error('Failed to rename');
+
+    // Optimistically update UI
+    setConversations(prev => 
+      prev.map(conv => conv.id === conversationId ? { ...conv, title: newTitle } : conv)
+    );
+  } catch (error) {
+    console.error('Rename failed:', error);
+    alert('Failed to rename conversation');
+  }
+};
+
+const handleDeleteConversation = async (conversationId: string) => {
+  try {
+    const response = await fetch(`http://localhost:4000/api/chat/conversations/${conversationId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+
+    if (!response.ok) throw new Error('Failed to delete');
+
+    // Update UI
+    setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+    
+    // If deleting active conversation, clear it
+    if (activeConversationId === conversationId) {
+      setActiveConversationId(null);
+      setMessages([]);
+    }
+  } catch (error) {
+    console.error('Delete failed:', error);
+    alert('Failed to delete conversation');
+  }
+};
+
+
 useEffect(() => {
   const handleClickOutside = () => {
     setShowProviderMenuRegen(false);
@@ -285,6 +333,9 @@ useEffect(() => {
           onClose={() => setIsSidebarOpen(false)}
           onCreateConversation={createConversation}
           onSelectConversation={setActiveConversationId}
+          onRenameConversation={handleRenameConversation}
+          onDeleteConversation={handleDeleteConversation}
+
         />
 
 

@@ -9,6 +9,8 @@ interface SidebarProps {
   onClose: () => void;
   onCreateConversation: () => void;
   onSelectConversation: (id: string) => void;
+  onRenameConversation: (id: string, newTitle: string) => void;  // NEW
+  onDeleteConversation: (id: string) => void;                   // NEW
 }
 
 export default memo(function ChatSidebar({ 
@@ -17,7 +19,9 @@ export default memo(function ChatSidebar({
   isOpen, 
   onClose, 
   onCreateConversation, 
-  onSelectConversation 
+  onSelectConversation,
+  onRenameConversation,
+  onDeleteConversation
 }: SidebarProps) {
   return (
     <div className={`fixed inset-y-0 left-0 w-80 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl shadow-2xl border-r border-white/50 dark:border-slate-700/50 z-40 transform transition-all duration-300 ease-in-out ${
@@ -62,22 +66,56 @@ export default memo(function ChatSidebar({
         ) : (
           <div className="space-y-3">
             {conversations.map(conv => (
-              <button
-                key={conv.id}
-                onClick={() => {
-                  onSelectConversation(conv.id);
-                  onClose();
-                }}
-                className={`w-full p-5 rounded-2xl transition-all hover:shadow-xl group ${
-                  activeConversationId === conv.id
-                    ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-2xl scale-105'
-                    : 'bg-white/70 dark:bg-slate-700/70 hover:bg-white dark:hover:bg-slate-600 border border-white/50 dark:border-slate-600 hover:border-purple-200 dark:hover:border-purple-400 hover:-translate-x-1'
-                }`}
-              >
-                <div className="font-semibold text-left truncate text-gray-900 dark:text-slate-100">
-                  {conv.title || 'Untitled'}
+              <div key={conv.id} className="group relative">
+                <button
+                  onClick={() => {
+                    onSelectConversation(conv.id);
+                    onClose();
+                  }}
+                  className={`w-full p-5 pr-12 rounded-2xl transition-all hover:shadow-xl relative z-10 ${
+                    activeConversationId === conv.id
+                      ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-2xl scale-105'
+                      : 'bg-white/70 dark:bg-slate-700/70 hover:bg-white dark:hover:bg-slate-600 border border-white/50 dark:border-slate-600 hover:border-purple-200 dark:hover:border-purple-400 hover:-translate-x-1'
+                  }`}
+                >
+                  <div className="font-semibold text-left truncate text-gray-900 dark:text-slate-100">
+                    {conv.title || 'New Chat'}
+                  </div>
+                </button>
+                
+                {/* Actions - hover to reveal */}
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 flex gap-1 z-20 pointer-events-none group-hover:pointer-events-auto">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const newTitle = prompt('Rename conversation:', conv.title || 'New Chat');
+                      if (newTitle && newTitle.trim()) {
+                        onRenameConversation(conv.id, newTitle.trim());
+                      }
+                    }}
+                    className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded transition-all duration-200"
+                    title="Rename"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm(`Delete "${conv.title || 'New Chat'}"? This cannot be undone.`)) {
+                        onDeleteConversation(conv.id);
+                      }
+                    }}
+                    className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/50 rounded transition-all duration-200"
+                    title="Delete"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         )}

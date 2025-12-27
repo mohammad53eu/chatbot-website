@@ -1,12 +1,12 @@
 //app/routes/chat.tsx
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
-import ChatSidebar from './ChatSidebar';
-import MessageArea from './MessagesArea';
-import InputArea from './InputArea';
-import ChatHeader from './ChatHeader';
-import type { Conversation, Message } from './types/chat';
+import { useTheme } from '../context/ThemeContext.js';
+import ChatSidebar from './ChatSidebar.js';
+import MessageArea from './MessagesArea.js';
+import InputArea from './InputArea.js';
+import ChatHeader from './ChatHeader.js';
+import type { Conversation, Message } from './types/chat.js';
 
 export default function ChatPage() {
   const navigate = useNavigate();

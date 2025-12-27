@@ -1,6 +1,6 @@
 // app/routes/MessageArea.tsx
 import { memo, useCallback, useRef, useEffect } from 'react';
-import type { Message } from './types/chat'; // Adjust import path
+import type { Message } from './types/chat.js'; // Adjust import path
 
 interface MessageAreaProps {
   messages: Message[];

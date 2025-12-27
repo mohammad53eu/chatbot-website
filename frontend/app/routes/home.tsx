@@ -1,7 +1,7 @@
 // frontend/routes/home.tsx
 import { memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../context/ThemeContext.js';
 
 export default memo(function Home() {
   const navigate = useNavigate();

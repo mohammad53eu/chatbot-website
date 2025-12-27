@@ -1,7 +1,7 @@
 // frontend/app/auth/Register.tsx
 import { useState, useCallback, useMemo, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../context/ThemeContext.js';
 
 const InputField = memo(({ 
   label, 

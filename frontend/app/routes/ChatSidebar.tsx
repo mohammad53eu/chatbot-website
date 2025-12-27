@@ -1,6 +1,6 @@
 // app/routes/ChatSidebar.tsx
 import { memo, useCallback } from 'react';
-import type { Conversation } from './types/chat';
+import type { Conversation } from './types/chat.js';
 
 interface SidebarProps {
   conversations: Conversation[];

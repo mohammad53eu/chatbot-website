@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 
-import { ThemeProvider } from "./context/ThemeContext"; // Add this
+import { ThemeProvider } from "./context/ThemeContext.js"; // Add this
 
 import type { Route } from "./+types/root";
 import "./app.css";

@@ -20,7 +20,7 @@
 
 <div align="center">
 
-![Chat Interface](https://github.com/mohammad53eu/chatbot-website/blob/main/Screenshot%20From%202025-12-27%2022-42-02.png)
+![Chat Interface](https://github.com/mohammad53eu/chatbot-website/blob/main/assests/website-screenshot.png)
 
 *Clean, modern interface with dark theme support and seamless provider switching*
 

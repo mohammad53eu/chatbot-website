@@ -20,7 +20,7 @@
 
 <div align="center">
 
-![Chat Interface](assets/chat-interface.png)
+![Chat Interface]([assets/chat-interface.png](https://github.com/mohammad53eu/chatbot-website/blob/main/assets/chat-interface.png))
 
 *Clean, modern interface with dark theme support and seamless provider switching*
 

@@ -3,6 +3,8 @@ import { useState, useCallback, useMemo, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext.js';
 
+
+
 const InputField = memo(({ 
   label, 
   icon, 
@@ -11,6 +13,8 @@ const InputField = memo(({
   onChange, 
   disabled, 
   placeholder,
+  error,
+  helperText,
   focusColor = 'emerald-400'
 }: any) => (
   <div className="space-y-2">
@@ -24,25 +28,44 @@ const InputField = memo(({
         onChange={onChange}
         required
         disabled={disabled}
-        className="w-full p-4 pl-12 pr-12 text-lg bg-white/70 dark:bg-slate-900/70 hover:bg-white/90 dark:hover:bg-slate-800/90 backdrop-blur-sm border-2 border-white/50 dark:border-slate-700/50 rounded-2xl shadow-lg outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/20 transition-all duration-300 placeholder-gray-500 dark:placeholder-slate-400 text-gray-900 dark:text-slate-100 peer"
+        className={`w-full p-4 pl-12 pr-12 text-lg bg-white/70 dark:bg-slate-900/70 hover:bg-white/90 dark:hover:bg-slate-800/90 backdrop-blur-sm border-2 ${
+          error 
+            ? 'border-red-500 dark:border-red-400' 
+            : 'border-white/50 dark:border-slate-700/50'
+        } rounded-2xl shadow-lg outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/20 transition-all duration-300 placeholder-gray-500 dark:placeholder-slate-400 text-gray-900 dark:text-slate-100 peer`}
         placeholder={placeholder}
       />
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-emerald-500 peer-focus:text-emerald-600 transition-colors flex items-center justify-center">
+      <div className={`absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 ${
+        error ? 'text-red-500' : 'text-emerald-500 peer-focus:text-emerald-600'
+      } transition-colors flex items-center justify-center`}>
         {icon}
       </div>
     </div>
+    {error && (
+      <p className="text-sm text-red-600 dark:text-red-400 ml-1 animate-shake">{error}</p>
+    )}
+    {helperText && !error && (
+      <p className="text-xs text-gray-500 dark:text-slate-400 ml-1">{helperText}</p>
+    )}
   </div>
 ));
 
 export default memo(function Register() {
+
+
   const [formData, setFormData] = useState({ email: '', username: '', password: '' });
+  const [errors, setErrors] = useState<{ email?: string; username?: string; password?: string; general?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { isDark , toggleTheme } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
 
   const handleInputChange = useCallback((field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [field]: e.target.value }));
-  }, []);
+    // Clear error for this field when user starts typing
+    if (errors[field as keyof typeof errors]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  }, [errors]);
 
   const icons = useMemo(() => ({
     email: (
@@ -68,48 +91,113 @@ export default memo(function Register() {
     { bottom: '20%', left: '25%', from: 'pink-300', to: 'pink-500', delay: '2000ms' }
   ], []);
 
+  const validateForm = () => {
+    const newErrors: typeof errors = {};
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Username validation
+    const usernameRegex = /^[a-zA-Z0-9]{3,20}$/;
+    if (!formData.username) {
+      newErrors.username = 'Username is required';
+    } else if (!usernameRegex.test(formData.username)) {
+      newErrors.username = 'Username must be 3-20 alphanumeric characters';
+    }
+
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    } else if (!/(?=.*[a-z])/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one lowercase letter';
+    } else if (!/(?=.*[A-Z])/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one uppercase letter';
+    } else if (!/(?=.*\d)/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one number';
+    } else if (!/(?=.*[!@#$%^&*])/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one special character (!@#$%^&*)';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Clear previous errors
+    setErrors({});
+
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
     
     const { email, username, password } = formData;
     
-    try {
-      const res = await fetch('http://localhost:4000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, username, password })
-      });
+    const res = await fetch('http://localhost:4000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, username, password })
+    });
+    
+    const data = await res.json();
+    setIsLoading(false);
+    
+    if (res.ok && data.success) {
+      localStorage.setItem('token', data.data.token);
+      navigate('/');
+    } else {
+      // Handle backend errors
+      const errorMessage = data.error?.message || data.error || 'Registration failed';
       
-      const data = await res.json();
-      
-      if (data.success) {
-        localStorage.setItem('token', data.data.token);
-        navigate('/');
+      // Map backend errors to specific fields
+      if (errorMessage.toLowerCase().includes('email') && errorMessage.toLowerCase().includes('already')) {
+        setErrors({ email: 'This email is already registered' });
+      } else if (errorMessage.toLowerCase().includes('username') && errorMessage.toLowerCase().includes('taken')) {
+        setErrors({ username: 'This username is already taken' });
+      } else if (errorMessage.toLowerCase().includes('email')) {
+        setErrors({ email: errorMessage });
+      } else if (errorMessage.toLowerCase().includes('username')) {
+        setErrors({ username: errorMessage });
+      } else if (errorMessage.toLowerCase().includes('password')) {
+        setErrors({ password: errorMessage });
+      } else if (errorMessage.toLowerCase().includes('validation')) {
+        setErrors({ general: 'Please check your input and try again' });
+      } else if (!res.ok) {
+        setErrors({ general: 'Unable to connect to server. Please try again.' });
       } else {
-        alert(data.error?.message || 'Registration failed');
+        setErrors({ general: errorMessage });
       }
-    } catch (err) {
-      alert('Network error – is backend running?');
-    } finally {
-      setIsLoading(false);
     }
   }, [formData, navigate]);
 
   const isFormValid = formData.email && formData.username && formData.password;
 
+
   return (
+    
     <div className={`min-h-screen flex items-center justify-center p-6 overflow-hidden relative ${
       isDark 
         ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950' 
         : 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100'
     }`}>
-       <button 
-            onClick={toggleTheme} 
-            className="fixed top-6 right-6 p-3 backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 z-50"
-          >
-            {isDark ? '☀️' : '🌙'}
-        </button>
+      <button 
+        onClick={toggleTheme} 
+        className="fixed top-6 right-6 p-3 backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 z-50"
+      >
+        {isDark ? '☀️' : '🌙'}
+      </button>
+      
       <div className="absolute inset-0 pointer-events-none">
         {particles.map((particle, i) => (
           <div
@@ -127,18 +215,14 @@ export default memo(function Register() {
         ))}
       </div>
 
-      
       <div className="relative w-full max-w-md mx-auto">
-        
         <div className="absolute -top-6 left-6 w-24 h-24 bg-gradient-to-r from-emerald-500 to-teal-600 dark:from-emerald-400 dark:to-teal-500 rounded-2xl flex items-center justify-center shadow-2xl -z-10">
           <svg className="w-10 h-10 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
           </svg>
         </div>
 
-        
         <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-8 shadow-2xl shadow-emerald-500/10 dark:shadow-emerald-500/20 hover:shadow-3xl transition-all duration-500 relative overflow-hidden group">
-          
           <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-emerald-500/20 via-transparent to-teal-600/20 dark:from-emerald-400/30 dark:to-teal-500/30 -m-1 pointer-events-none group-hover:scale-105 transition-transform duration-500" />
           
           <div className="relative z-10">
@@ -149,6 +233,17 @@ export default memo(function Register() {
               <p className="text-gray-600 dark:text-slate-300 text-lg">Join us</p>
             </div>
 
+            {errors.general && (
+              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl animate-shake">
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-sm text-red-800 dark:text-red-200">{errors.general}</p>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <InputField
                 label="Email Address"
@@ -158,6 +253,7 @@ export default memo(function Register() {
                 onChange={handleInputChange('email')}
                 disabled={isLoading}
                 placeholder="Enter your email"
+                error={errors.email}
               />
               <InputField
                 label="Username"
@@ -167,6 +263,8 @@ export default memo(function Register() {
                 onChange={handleInputChange('username')}
                 disabled={isLoading}
                 placeholder="Choose a username"
+                error={errors.username}
+                helperText="3-20 alphanumeric characters only"
               />
               <InputField
                 label="Password"
@@ -176,6 +274,14 @@ export default memo(function Register() {
                 onChange={handleInputChange('password')}
                 disabled={isLoading}
                 placeholder="Create a password"
+                error={errors.password}
+                helperText={
+                  <ul className="space-y-1 mt-1">
+                    <li>• At least 8 characters</li>
+                    <li>• One uppercase and one lowercase letter</li>
+                    <li>• One number and one special character (!@#$%^&*)</li>
+                  </ul>
+                }
               />
 
               <button

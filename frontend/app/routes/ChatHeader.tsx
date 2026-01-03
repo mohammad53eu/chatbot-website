@@ -8,14 +8,14 @@ interface ChatHeaderProps {
 
 export default memo(function ChatHeader({ isSidebarOpen, onToggleSidebar }: ChatHeaderProps) {
   return (
-    <div className="p-6 border-b border-white/50 dark:border-slate-700/50 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl sticky top-0 z-20 flex-shrink-0">
+    <div className="p-6 border-b border-white/30 dark:border-slate-700/30 bg-transparent backdrop-blur-xl sticky top-0 z-20 flex-shrink-0">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleSidebar}
-            className="p-3 rounded-2xl bg-white/50 dark:bg-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-600/70 backdrop-blur-sm shadow-lg transition-all hover:shadow-xl flex-shrink-0"
+            className="p-3 rounded-2xl bg-white/60 dark:bg-slate-800/60 hover:bg-white/80 dark:hover:bg-slate-700/80 backdrop-blur-sm shadow-lg transition-all hover:shadow-xl hover:scale-105 active:scale-95 flex-shrink-0"
           >
-            <svg className={`w-5 h-5 transition-transform duration-300 ${isSidebarOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={`w-5 h-5 transition-transform duration-300 text-gray-700 dark:text-slate-300 ${isSidebarOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
@@ -27,7 +27,10 @@ export default memo(function ChatHeader({ isSidebarOpen, onToggleSidebar }: Chat
             </div>
             <div>
               <p className="font-semibold text-gray-900 dark:text-slate-100">AI Assistant</p>
-              <p className="text-sm text-gray-500 dark:text-slate-400">Online</p>
+              <p className="text-xs text-gray-500 dark:text-slate-400 flex items-center gap-1">
+                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                Online
+              </p>
             </div>
           </div>
         </div>

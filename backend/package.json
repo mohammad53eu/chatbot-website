@@ -34,7 +34,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.9.0",
     "@types/pg": "^8.15.6",
-    "tsx": "^4.19.2",
-    "typescript": "^5.9.2"
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
